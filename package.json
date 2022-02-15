@@ -1,6 +1,13 @@
 {
-  "name": "near-funding",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT"
+	"name": "near-funding",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"devDependencies": {
+		"near-sdk-as": "^3.2.3"
+	},
+	"scripts": {
+		"test": "yarn asp -f unit.spec",
+		"build": "asb --target debug"
+	}
 }
