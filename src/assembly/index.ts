@@ -53,3 +53,40 @@ export function addProject(
 
 	return 0
 }
+
+// Get function to get the list of users
+export function getUsers(): Array<u32> {
+	let users = new Array<u32>()
+
+	// put all user.id to users
+	for (let i = 0; i < userIdList.length; i++) {
+		users.push(userIdList[i])
+	}
+
+	return users;
+}
+
+// Get function to get the list of all projects by a user
+export function getProjects(userId: u32): Array<u32> {
+	let projectList = new Array<u32>();
+	let projectByUser = userProjectMap.getSome(userId);
+
+	for (let i = 0; i < projectIdList.length; i++) {
+		if (projectByUser.contains(projectIdList[i])) {
+			projectList.push(projectIdList[i])
+		}
+	}
+
+	return projectList;
+}
+
+// Function to get all projects listed on the platform
+export function allProjects(): Array<u32> {
+	let projectList = new Array<u32>();
+
+	for (let i = 0; i < projectIdList.length; i++) {
+		projectList.push(projectIdList[i]);
+	}
+
+	return projectList;
+}
