@@ -1,5 +1,5 @@
 import { USER, Project } from "./model"
-import { logging, PersistentMap, PersistentVector, u128 } from "near-sdk-as"
+import { context, ContractPromiseBatch, logging, PersistentMap, PersistentVector, u128 } from "near-sdk-as"
 
 // key:value map
 // every map contains a prefix like `("u")` that should be unique
@@ -89,4 +89,25 @@ export function allProjects(): Array<u32> {
 	}
 
 	return projectList;
+}
+
+
+// cross-contract call
+// documentation - https://near.github.io/near-sdk-as/classes/_sdk_core_assembly_promise_.contractpromisebatch.html
+export function donate(userId: u32, projectId: u32): string {
+	for (let i = 0; i < userIdList.length; i++) {
+		if (userList.contains(userId)) {
+			const projects = userProjectMap.getSome(userId)
+			const project = projects.getSome(projectId)
+
+			project.funds = u128.sub(project.funds, context.attachedDeposit)
+			projects.set(project.id, project)
+			userProjectMap.set(userId, projects)
+
+			const to_benificiary = ContractPromiseBatch.create("ankitzm.testnet")
+			to_benificiary.transfer(10)
+            return "Done"
+		}
+	}
+	return "Could Not Complete"
 }
