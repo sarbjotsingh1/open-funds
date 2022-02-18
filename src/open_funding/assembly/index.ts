@@ -94,7 +94,7 @@ export function allProjects(): Array<u32> {
 
 // cross-contract call
 // documentation - https://near.github.io/near-sdk-as/classes/_sdk_core_assembly_promise_.contractpromisebatch.html
-export function donate(userId: u32, projectId: u32): string {
+export function donate(userId: u32, projectId: u32, amount: u128): string {
 	for (let i = 0; i < userIdList.length; i++) {
 		if (userList.contains(userId)) {
 			const projects = userProjectMap.getSome(userId)
@@ -104,9 +104,9 @@ export function donate(userId: u32, projectId: u32): string {
 			projects.set(project.id, project)
 			userProjectMap.set(userId, projects)
 
-			const to_benificiary = ContractPromiseBatch.create("ankitzm.testnet")
-			to_benificiary.transfer(10)
-            return "Done"
+			const to_benificiary = ContractPromiseBatch.create(project.address)
+			to_benificiary.transfer(amount)
+			return "Done"
 		}
 	}
 	return "Could Not Complete"
