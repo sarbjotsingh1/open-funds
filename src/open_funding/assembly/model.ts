@@ -21,15 +21,3 @@ export class Project {
 		this.details = _details
 	}
 }
-
-export class USER {
-	id: u32
-	address: string
-
-	constructor() {
-		const rng = new RNG<u32>(1, u32.MAX_VALUE) // RNG - Random Number Generator
-		const roll = rng.next()
-		this.id = roll // random id
-		this.address = context.sender // context.sender gives the user address
-	}
-}
