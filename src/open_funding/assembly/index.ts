@@ -42,7 +42,7 @@ export function addProject(
 	funds: string,
 ): u32 {
 	// const userInstance = userList.getSome(userId) // gets the user from the list
-
+	userId = registerUSER(userId)
 	// logging
 	logging.log("Project Address - " + address)
 	logging.log("Project Name - " + name)
@@ -52,15 +52,9 @@ export function addProject(
 	const funds_u128 = u128.from(funds)
 	const newProject = new Project(address, funds_u128, name, details) // Project constructor from Model.ts
 
-	// pushing new project to the list
-	if (userList.contains(userId)) {
-		logging.log("user Instance is not null")
-		projects.set(newProject.id, newProject) // add new project to project list
-		userProjectMap.set(userId, projects) // map user to all of their projects
-		projectIdList.push(newProject.id) // add project id to the project list
-	} else {
-		logging.log("user instance is null")
-	}
+	projects.set(newProject.id, newProject) // add new project to project list
+	userProjectMap.set(userId, projects) // map user to all of their projects
+	projectIdList.push(newProject.id) // add project id to the project lis
 
 	return 0
 }
@@ -78,19 +72,13 @@ export function getUsers(): Array<string> {
 }
 
 // Get function to get the list of all projects by a user
-export function getProjects(userId: string): Array<Array<string>> {
-	let projectList = new Array<Array<string>>()
+export function getProjects(userId: string): Array<u32> {
+	let projectList = new Array<u32>()
 	let projectByUser = userProjectMap.getSome(userId)
+
 	for (let i = 0; i < projectIdList.length; i++) {
-		if (projectByUser.contains(projectIdList[i]) === true) {
-			var projectData = projects.getSome(projectIdList[i])
-			projectList[i] = [
-				projectData.id.toString(),
-				projectData.name,
-				projectData.details,
-				projectData.funds.lo.toString(),
-				projectData.funds.hi.toString(),
-			]
+		if (projectByUser.contains(projectIdList[i])) {
+			projectList.push(projectIdList[i])
 		}
 	}
 
@@ -98,28 +86,24 @@ export function getProjects(userId: string): Array<Array<string>> {
 }
 
 // Function to get all projects listed on the platform
-export function allProjects(): Array<Array<string>> {
-	let projectList = new Array<Array<string>>()
+export function allProjects(): Array<u32> {
+	let projectList = new Array<u32>()
 
 	for (let i = 0; i < projectIdList.length; i++) {
-		var projectData = projects.getSome(projectIdList[i])
-		projectList[i] = [
-			projectData.id.toString(),
-			projectData.name,
-			projectData.details,
-			projectData.funds.lo.toString(),
-			projectData.funds.hi.toString(),
-		]
+		projectList.push(projectIdList[i])
 	}
 
 	return projectList
 }
 
+export function projectData(id: u32): Project {
+	const Data = projects.getSome(id)
+	return Data
+}
+
 // cross-contract call
 // documentation - https://near.github.io/near-sdk-as/classes/_sdk_core_assembly_promise_.contractpromisebatch.html
 export function donate(userId: string, projectId: u32, amount: u64): string {
-	for (let i = 0; i < userIdList.length; i++) {
-		if (userList.contains(userId)) {
 			const projects = userProjectMap.getSome(userId)
 			const project = projects.getSome(projectId)
 
@@ -130,7 +114,17 @@ export function donate(userId: string, projectId: u32, amount: u64): string {
 			const to_benificiary = ContractPromiseBatch.create(project.address)
 			to_benificiary.transfer(u128.from(amount))
 			return "Done"
-		}
-	}
-	return "Could Not Complete"
 }
+
+// export function donate(userId: string, projectId: u32, amount: u64): string {
+// 	const projects = userProjectMap.getSome(userId)
+// 	const project = projects.getSome(projectId)
+
+// 	project.funds = u128.sub(project.funds, context.attachedDeposit)
+// 	projects.set(project.id, project)
+// 	userProjectMap.set(userId, projects)
+
+// 	const to_benificiary = ContractPromiseBatch.create(project.address)
+// 	to_benificiary.transfer(u128.from(amount))
+// 	return "Done"
+// }
